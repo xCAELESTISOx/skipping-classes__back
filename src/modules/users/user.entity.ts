@@ -3,10 +3,12 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   Relation,
 } from 'typeorm';
 import { Group } from '../groups/group.entity';
+import { Skip } from '../skips/skip.entity';
 
 export enum UserRole {
   SUPERADMIN = 'SUPERADMIN',
@@ -38,4 +40,7 @@ export class User {
   @ManyToOne(() => Group, (group) => group.users)
   @JoinColumn({ name: 'groupId' })
   group?: Relation<Group>;
+
+  @OneToMany(() => Skip, (skip) => skip.student)
+  skips: Relation<Skip[]>;
 }

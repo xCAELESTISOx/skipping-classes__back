@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 
 import { GroupsService } from './groups.service';
 import { Group } from './group.entity';
@@ -10,6 +10,11 @@ export class GroupsController {
   @Post()
   create(@Body() group: Group): Promise<Group> {
     return this.groupsService.create(group);
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: number): Promise<Group> {
+    return this.groupsService.findOne(id);
   }
 
   @Get()

@@ -4,18 +4,18 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './modules/users/users.module';
 
 import 'reflect-metadata';
-import { User } from './modules/users/user.entity';
-import { Group } from './modules/groups/group.entity';
-import { GroupsService } from './modules/groups/groups.service';
-import { GroupsController } from './modules/groups/groups.controller';
+
+import { DisciplinesModule } from './modules/disciplines/disciplines.module';
 import { GroupsModule } from './modules/groups/groups.module';
+import { LessonsModule } from './modules/lessons/lessons.module';
+import { SkipsModule } from './modules/skips/skips.module';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'sqlite',
       database: 'attends-bd',
-      entities: [User, Group],
+      entities: ['./modules/*/*.entity.ts'],
       autoLoadEntities: true,
       logging: true,
       synchronize: true,
@@ -25,6 +25,9 @@ import { GroupsModule } from './modules/groups/groups.module';
     }),
     UsersModule,
     GroupsModule,
+    DisciplinesModule,
+    LessonsModule,
+    SkipsModule,
   ],
 })
 export class AppModule {}

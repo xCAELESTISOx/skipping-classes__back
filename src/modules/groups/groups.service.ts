@@ -1,6 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 
 import { Group } from './group.entity';
 
@@ -15,7 +15,11 @@ export class GroupsService {
     return this.groupsRepository.save(group);
   }
 
-  findAll(): Promise<Group[]> {
-    return this.groupsRepository.find();
+  findOne(id: number): Promise<Group> {
+    return this.groupsRepository.findOne({ where: { id } });
+  }
+
+  findAll(name?: string): Promise<Group[]> {
+    return this.groupsRepository.find({ where: { name: Like(`%${name}%`) } });
   }
 }
