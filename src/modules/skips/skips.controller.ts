@@ -10,9 +10,10 @@ import {
 } from '@nestjs/common';
 
 import { CreateSkipDTO } from './dto/createSkip.dto';
+import { GetSkipsDTO } from './dto/getSkips.dto';
+
 import { SkipsService } from './skips.service';
 import { Skip, SkipArgueStatus } from './skip.entity';
-import { UpdateResult } from 'typeorm';
 
 @Controller('skips')
 export class SkipsController {
@@ -39,7 +40,7 @@ export class SkipsController {
   }
 
   @Get()
-  findAll(): Promise<Skip[]> {
-    return this.skipsService.findAll();
+  findAll(@Body() skipsData: GetSkipsDTO): Promise<Skip[]> {
+    return this.skipsService.findAll(skipsData);
   }
 }

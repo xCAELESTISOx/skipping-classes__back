@@ -1,9 +1,10 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { HttpException, Injectable } from '@nestjs/common';
-import { Repository, UpdateResult } from 'typeorm';
+import { Repository } from 'typeorm';
 
 import { CreateSkipDTO } from './dto/createSkip.dto';
 import { Skip, SkipArgueStatus } from './skip.entity';
+import { GetSkipsDTO } from './dto/getSkips.dto';
 
 @Injectable()
 export class SkipsService {
@@ -31,7 +32,17 @@ export class SkipsService {
     return this.skipsRepository.update(id, { status: newStatus });
   }
 
-  findAll(): Promise<Skip[]> {
-    return this.skipsRepository.find();
+  findAll(skipsData: GetSkipsDTO): Promise<Skip[]> {
+    const { filters, limit = 50, page = 1 } = skipsData;
+    const offset = limit * (page - 1);
+
+    let queryBuilder = this.skipsRepository.createQueryBuilder('lesson');
+
+    if (filters?.studentId)
+      queryBuilder = queryBuilder.where('lesson.studentId = :studentId', {
+        studentId: filters?.studentId,
+      });
+
+    return queryBuilder.skip(offset).take(limit).getMany();
   }
 }
