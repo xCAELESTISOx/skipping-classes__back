@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { Group } from '../groups/group.entity';
 import { Skip } from '../skips/skip.entity';
+import { Exclude } from 'class-transformer';
 
 export enum UserRole {
   SUPERADMIN = 'SUPERADMIN',
@@ -31,7 +32,7 @@ export class User {
   @Column()
   lastname: string;
 
-  @Column()
+  @Column({ default: UserRole.STUDENT })
   role: UserRole;
 
   @Column({ unique: true })
@@ -40,7 +41,8 @@ export class User {
   @Column({ nullable: true })
   groupId?: number;
 
-  @Column()
+  @Exclude({ toPlainOnly: true })
+  @Column({ select: false })
   password: string;
 
   @ManyToOne(() => Group, (group) => group.users)
@@ -49,4 +51,8 @@ export class User {
 
   @OneToMany(() => Skip, (skip) => skip.student)
   skips: Relation<Skip[]>;
+
+  constructor(partial: Partial<User>) {
+    Object.assign(this, partial);
+  }
 }

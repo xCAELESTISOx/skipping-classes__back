@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  HttpException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -7,13 +8,18 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
 import { UsersService } from '../users/users.service';
-import { SignInDTO } from './dto/SignIn.dto';
+import { SignInDTO } from './dto/signIn.dto';
 import { CreateUserDTO } from '../users/dto/createUser.dto';
+import { JWT_SECRET_KEY } from '../../const';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from '../users/user.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private usersService: UsersService,
+    @InjectRepository(User)
+    private readonly usersRepository: Repository<User>,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -29,9 +35,15 @@ export class AuthService {
 
   async signUp(userData: CreateUserDTO) {
     const { email, password } = userData;
+    if (!password) throw new HttpException('You must provide a password', 422);
+
+    if (password.length < 8)
+      throw new HttpException('Password must be 8 digits length', 422);
 
     // Проверка уникальности электронной почты
-    const existingUser = await this.usersService.findOne({ email });
+    const existingUser = await this.usersRepository.findOne({
+      where: { email },
+    });
     if (existingUser) {
       throw new ConflictException('User with this email already exists');
     }
@@ -40,16 +52,20 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Создание и сохранение пользователя
-    return this.usersService.create({
+    const user = await this.usersRepository.create({
       ...userData,
       password: hashedPassword,
     });
+    return await this.usersRepository.save(user);
   }
 
   async signIn(userData: SignInDTO): Promise<string> {
-    const user = await this.usersService.findOne({
-      email: userData.email,
+    const user = await this.usersRepository.findOne({
+      where: { email: userData.email },
+      select: ['password', 'id'],
     });
+
+    console.log(user);
 
     // Check if the user exists
     if (user) {
@@ -63,7 +79,7 @@ export class AuthService {
         // Generate a JWT token
         const token = this.jwtService.sign(
           { id: user.id, username: user.email },
-          { secret: process.env.JWT_SECRET_KEY },
+          { secret: JWT_SECRET_KEY },
         );
 
         return token;

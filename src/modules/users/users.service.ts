@@ -14,7 +14,9 @@ export class UsersService {
     private readonly usersRepository: Repository<User>,
   ) {}
 
-  create(user: CreateUserDTO): Promise<User> {
+  async create(userData: CreateUserDTO): Promise<User> {
+    const user = this.usersRepository.create(userData);
+
     return this.usersRepository.save(user);
   }
 
@@ -36,7 +38,7 @@ export class UsersService {
     return this.usersRepository.update(studentId, student);
   }
 
-  findAll(search: string, user?: User): Promise<User[]> {
+  async findAll(search: string, user?: User): Promise<User[]> {
     // return this.usersRepository
     //   .createQueryBuilder('user')
     //   .where('user.title like :search', { search: `%${search}%` })
@@ -44,13 +46,21 @@ export class UsersService {
     //   .andWhere('user.role = :role', { role: user?.role })
     //   .getMany();
 
-    return this.usersRepository
+    const users = await this.usersRepository
       .createQueryBuilder('main')
       .leftJoinAndSelect('main.skips', 'skip')
       .getMany();
+
+    users.forEach((user) => {
+      delete user.password;
+    });
+
+    return users;
   }
 
-  findOne(params: FindUserDTO): Promise<User> {
-    return this.usersRepository.findOne({ where: params });
+  async findOne(params: FindUserDTO): Promise<User> {
+    const user = await this.usersRepository.findOne({ where: params });
+
+    return user;
   }
 }
