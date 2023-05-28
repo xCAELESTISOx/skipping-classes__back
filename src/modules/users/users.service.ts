@@ -3,6 +3,8 @@ import { Injectable } from '@nestjs/common';
 import { Repository, UpdateResult } from 'typeorm';
 
 import { CreateUserDTO } from './dto/createUser.dto';
+import { FindUserDTO } from './dto/findUser.dto';
+
 import { User } from './user.entity';
 
 @Injectable()
@@ -20,6 +22,20 @@ export class UsersService {
     return this.usersRepository.update(id, user);
   }
 
+  async addStudentToGroup(
+    studentId: number,
+    groupId: number,
+  ): Promise<UpdateResult> {
+    const student = await this.usersRepository.findOne({
+      where: { id: studentId },
+    });
+
+    if (student.role !== 'STUDENT') throw new Error('User is not a student');
+
+    student.groupId = groupId;
+    return this.usersRepository.update(studentId, student);
+  }
+
   findAll(search: string, user?: User): Promise<User[]> {
     // return this.usersRepository
     //   .createQueryBuilder('user')
@@ -34,7 +50,7 @@ export class UsersService {
       .getMany();
   }
 
-  findOne(id: number) {
-    return this.usersRepository.find({ where: { id } });
+  findOne(params: FindUserDTO): Promise<User> {
+    return this.usersRepository.findOne({ where: params });
   }
 }

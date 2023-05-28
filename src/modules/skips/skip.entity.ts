@@ -9,6 +9,7 @@ import {
 import { Lesson } from '../lessons/lesson.entity';
 import { User } from '../users/user.entity';
 
+/** Статусы оспаривания пропуска */
 export enum SkipArgueStatus {
   UNARGUED = 'UNARGUED',
   WAITING_FOR_CONFIRMATION = 'WAITING_FOR_CONFIRMATION',
@@ -26,6 +27,9 @@ export class Skip {
     default: SkipArgueStatus.UNARGUED,
   })
   status: SkipArgueStatus;
+
+  @Column()
+  lessonId: number;
 
   @ManyToOne(() => Lesson, (lesson) => lesson.skips)
   @JoinColumn({ name: 'lessonId' })

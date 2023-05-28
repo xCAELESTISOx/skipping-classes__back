@@ -1,8 +1,3 @@
-import { User, UserRole } from '../user.entity';
+import { SignUpDTO } from '../../auth/dto/signUp.dto';
 
-export class CreateUserDTO implements Omit<User, 'id' | 'skips' | 'group'> {
-  firstname: string;
-  middlename: string;
-  role: UserRole;
-  lastname: string;
-}
+export class CreateUserDTO extends SignUpDTO {}

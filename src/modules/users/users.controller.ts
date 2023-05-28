@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Param,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
 
 import { UsersService } from './users.service';
 import { User } from './user.entity';
@@ -15,6 +25,20 @@ export class UsersController {
     } catch (err) {
       console.log(err);
     }
+  }
+
+  @Put(':id/add-to-group')
+  addStudentToGroup(
+    @Param('id') id: number,
+    @Body('groupId') groupdId: number,
+  ) {
+    if (!groupdId)
+      throw new HttpException(
+        'groupId is required',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+
+    return this.usersService.addStudentToGroup(id, groupdId);
   }
 
   @Get()

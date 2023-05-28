@@ -1,6 +1,8 @@
-import { Skip, SkipArgueStatus } from '../skip.entity';
+import { Skip } from '../skip.entity';
 
-export class CreateSkipDTO implements Omit<Skip, 'id' | 'lesson' | 'student'> {
-  status: SkipArgueStatus;
+export class CreateSkipDTO
+  implements Omit<Skip, 'id' | 'lesson' | 'student' | 'status'>
+{
+  lessonId: number;
   studentId: number;
 }

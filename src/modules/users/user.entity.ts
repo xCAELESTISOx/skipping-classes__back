@@ -34,8 +34,14 @@ export class User {
   @Column()
   role: UserRole;
 
-  @Column({ unique: true, nullable: true })
-  email?: string;
+  @Column({ unique: true })
+  email: string;
+
+  @Column({ nullable: true })
+  groupId?: number;
+
+  @Column()
+  password: string;
 
   @ManyToOne(() => Group, (group) => group.users)
   @JoinColumn({ name: 'groupId' })

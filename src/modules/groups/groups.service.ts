@@ -20,6 +20,8 @@ export class GroupsService {
   }
 
   findAll(name?: string): Promise<Group[]> {
-    return this.groupsRepository.find({ where: { name: Like(`%${name}%`) } });
+    return this.groupsRepository.find({
+      where: { name: name ? Like(`%${name}%`) : undefined },
+    });
   }
 }
