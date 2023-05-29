@@ -5,10 +5,10 @@ import {
   HttpException,
   HttpStatus,
   Param,
-  Post,
   Put,
-  Query,
 } from '@nestjs/common';
+
+import { GetUsersListDTO } from './dto/getUsersList.dto';
 
 import { UsersService } from './users.service';
 import { User } from './user.entity';
@@ -17,22 +17,28 @@ import { User } from './user.entity';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Put(':id/add-to-group')
+  @Put(':studentId/add-to-group/:groupId')
   addStudentToGroup(
-    @Param('id') id: number,
-    @Body('groupId') groupdId: number,
+    @Param('studentId') studentId: number,
+    @Param('groupId') groupdId: number,
   ) {
     if (!groupdId)
       throw new HttpException(
-        'groupId is required',
+        'You must provide groupId',
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
 
-    return this.usersService.addStudentToGroup(id, groupdId);
+    return this.usersService.addStudentToGroup(studentId, groupdId);
   }
 
   @Get()
-  findAll(@Query('search') search?: string): Promise<User[]> {
-    return this.usersService.findAll(search);
+  findAll(@Body() params: GetUsersListDTO): Promise<User[]> {
+    return this.usersService.findAll(params);
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id?: number, @Body('email') email?: string) {
+    const params = { id, email };
+    return this.usersService.findOne(params);
   }
 }

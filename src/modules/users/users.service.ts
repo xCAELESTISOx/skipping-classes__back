@@ -1,11 +1,12 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { Repository, UpdateResult } from 'typeorm';
 
 import { CreateUserDTO } from './dto/createUser.dto';
 import { FindUserDTO } from './dto/findUser.dto';
 
 import { User } from './user.entity';
+import { GetUsersListDTO } from './dto/getUsersList.dto';
 
 @Injectable()
 export class UsersService {
@@ -16,7 +17,6 @@ export class UsersService {
 
   async create(userData: CreateUserDTO): Promise<User> {
     const user = this.usersRepository.create(userData);
-
     return this.usersRepository.save(user);
   }
 
@@ -32,30 +32,27 @@ export class UsersService {
       where: { id: studentId },
     });
 
-    if (student.role !== 'STUDENT') throw new Error('User is not a student');
+    if (student.role !== 'STUDENT')
+      throw new HttpException('Provided User is not a student', 422);
 
     student.groupId = groupId;
     return this.usersRepository.update(studentId, student);
   }
 
-  async findAll(search: string, user?: User): Promise<User[]> {
-    // return this.usersRepository
-    //   .createQueryBuilder('user')
-    //   .where('user.title like :search', { search: `%${search}%` })
-    //   .orWhere('user.pseudo like :search', { search: `%${search}%` })
-    //   .andWhere('user.role = :role', { role: user?.role })
-    //   .getMany();
+  async findAll(params: GetUsersListDTO): Promise<User[]> {
+    const { filters, limit = 50, page = 1 } = params;
+    const offset = limit * (page - 1);
 
-    const users = await this.usersRepository
-      .createQueryBuilder('main')
-      .leftJoinAndSelect('main.skips', 'skip')
-      .getMany();
+    let queryBuilder = this.usersRepository.createQueryBuilder('user');
 
-    users.forEach((user) => {
-      delete user.password;
-    });
+    console.log(filters?.groupsIds);
 
-    return users;
+    if (filters?.groupsIds?.length)
+      queryBuilder = queryBuilder.where('user.groupId IN (:...groupsIds)', {
+        groupsIds: filters.groupsIds,
+      });
+
+    return queryBuilder.skip(offset).take(limit).getMany();
   }
 
   async findOne(params: FindUserDTO): Promise<User> {

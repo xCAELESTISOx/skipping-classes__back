@@ -1,7 +1,6 @@
 import {
   Controller,
   Post,
-  UseGuards,
   ClassSerializerInterceptor,
   UseInterceptors,
   Headers,
@@ -12,7 +11,6 @@ import {
 import { SignInDTO } from './dto/signIn.dto';
 import { SignUpDTO } from './dto/signUp.dto';
 
-import JwtAuthenticationGuard from '../../utils/JWTGuard';
 import { AuthService } from './auth.service';
 import { User } from '../users/user.entity';
 import { Response } from 'express';
