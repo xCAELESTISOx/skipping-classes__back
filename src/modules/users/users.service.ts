@@ -52,7 +52,11 @@ export class UsersService {
         groupsIds: filters.groupsIds,
       });
 
-    return queryBuilder.skip(offset).take(limit).getMany();
+    return queryBuilder
+      .skip(offset)
+      .take(limit)
+      .orderBy('user.lastname', 'ASC')
+      .getMany();
   }
 
   async findOne(params: FindUserDTO): Promise<User> {
