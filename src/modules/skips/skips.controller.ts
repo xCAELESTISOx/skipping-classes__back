@@ -7,6 +7,8 @@ import {
   Param,
   Post,
   Put,
+  Query,
+  ValidationPipe,
 } from '@nestjs/common';
 
 import { CreateSkipDTO } from './dto/createSkip.dto';
@@ -40,7 +42,7 @@ export class SkipsController {
   }
 
   @Get()
-  findAll(@Body() skipsData: GetSkipsDTO): Promise<Skip[]> {
+  findAll(@Query() skipsData: GetSkipsDTO): Promise<Skip[]> {
     return this.skipsService.findAll(skipsData);
   }
 }

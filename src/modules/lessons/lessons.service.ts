@@ -23,7 +23,9 @@ export class LessonsService {
     });
     lesson.groups = groups;
 
-    return this.lessonsRepository.save(lesson);
+    const newLesson = this.lessonsRepository.create(lesson);
+
+    return await this.lessonsRepository.save(newLesson);
   }
 
   /** Добавить группу к паре */
@@ -42,32 +44,45 @@ export class LessonsService {
   }
 
   /** Получить список пар */
-  findAll(params: GetLessonsDTO): Promise<Lesson[]> {
-    const { filters, limit = 50, page = 1 } = params;
+  async findAll(params: GetLessonsDTO): Promise<Lesson[]> {
+    const { startTime, endTime, groupsIds, limit = 50, page = 1 } = params;
     const offset = limit * (page - 1);
 
-    let selectQueryBuilder =
-      this.lessonsRepository.createQueryBuilder('lesson');
+    let selectQueryBuilder = this.lessonsRepository
+      .createQueryBuilder('lesson')
+      .leftJoinAndSelect('lesson.discipline', 'discipline')
+      .leftJoinAndSelect('lesson.groups', 'group');
 
-    if (filters?.startTime)
+    console.log(groupsIds);
+
+    if (groupsIds?.length) {
+      selectQueryBuilder = selectQueryBuilder.where(
+        'group.id IN (:...groupsIds)',
+        { groupsIds },
+      );
+    }
+
+    if (startTime)
       selectQueryBuilder = selectQueryBuilder.where(
         'lesson.time > :startTime',
-        { startTime: new Date(filters.startTime) },
+        { startTime: new Date(startTime) },
       );
 
-    if (filters?.endTime && !filters?.startTime)
+    if (endTime && !startTime)
       selectQueryBuilder = selectQueryBuilder.where('lesson.time < :endTime', {
-        endTime: new Date(filters.endTime),
+        endTime: new Date(endTime),
       });
 
-    if (filters?.endTime && filters?.startTime)
+    if (endTime && startTime)
       selectQueryBuilder = selectQueryBuilder.andWhere(
         'lesson.time < :endTime',
         {
-          endTime: new Date(filters.endTime),
+          endTime: new Date(endTime),
         },
       );
 
-    return selectQueryBuilder.skip(offset).take(limit).getMany();
+    const lessons = await selectQueryBuilder.skip(offset).take(limit).getMany();
+
+    return lessons.map((lesson) => ({ ...lesson, disciplineId: undefined }));
   }
 }

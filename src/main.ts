@@ -1,7 +1,5 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 
-import { UsersController } from './modules/users/users.controller';
-import { User, UserRole } from './modules/users/user.entity';
 import { AppModule } from './app.module';
 
 import 'reflect-metadata';
@@ -12,7 +10,8 @@ async function bootstrap() {
 
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
-  await app.listen(3000);
+  await app.listen(6060);
   console.log('Nestjs is ready to go!');
 }
+
 bootstrap();

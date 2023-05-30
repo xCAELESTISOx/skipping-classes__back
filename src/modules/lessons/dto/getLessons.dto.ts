@@ -1,12 +1,12 @@
-interface LessonsFilters {
-  startTime: Date;
-  endTime: Date;
-  groupsIds: number[];
-}
+import { Transform } from 'class-transformer';
 
 export class GetLessonsDTO {
-  public filters?: Partial<LessonsFilters>;
+  startTime?: Date;
+  endTime?: Date;
 
-  public limit?: number = 50;
-  public page?: number = 1;
+  @Transform(({ value }) => value.split(',').filter((i) => i && i != 0))
+  groupsIds?: number[];
+
+  limit?: number = 50;
+  page?: number = 1;
 }

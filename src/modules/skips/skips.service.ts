@@ -32,15 +32,16 @@ export class SkipsService {
     return this.skipsRepository.update(id, { status: newStatus });
   }
 
+  /** Получить список пропусков */
   findAll(skipsData: GetSkipsDTO): Promise<Skip[]> {
-    const { filters, limit = 50, page = 1 } = skipsData;
+    const { studentId, limit = 50, page = 1 } = skipsData;
     const offset = limit * (page - 1);
 
     let queryBuilder = this.skipsRepository.createQueryBuilder('lesson');
 
-    if (filters?.studentId)
+    if (studentId)
       queryBuilder = queryBuilder.where('lesson.studentId = :studentId', {
-        studentId: filters?.studentId,
+        studentId,
       });
 
     return queryBuilder.skip(offset).take(limit).getMany();

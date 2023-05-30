@@ -1,9 +1,8 @@
-export interface GetUsersListFilters {
-  groupsIds: number[];
-}
+import { Transform } from 'class-transformer';
 
 export class GetUsersListDTO {
-  filters?: Partial<GetUsersListFilters>;
+  @Transform(({ value }) => value.split(',').filter((i) => i && i != 0))
+  groupsIds?: number[];
   limit?: number;
   page?: number;
 }

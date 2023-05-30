@@ -40,16 +40,14 @@ export class UsersService {
   }
 
   async findAll(params: GetUsersListDTO): Promise<User[]> {
-    const { filters, limit = 50, page = 1 } = params;
+    const { groupsIds, limit = 50, page = 1 } = params;
     const offset = limit * (page - 1);
 
     let queryBuilder = this.usersRepository.createQueryBuilder('user');
 
-    console.log(filters?.groupsIds);
-
-    if (filters?.groupsIds?.length)
+    if (groupsIds?.length)
       queryBuilder = queryBuilder.where('user.groupId IN (:...groupsIds)', {
-        groupsIds: filters.groupsIds,
+        groupsIds,
       });
 
     return queryBuilder

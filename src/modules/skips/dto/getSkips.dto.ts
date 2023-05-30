@@ -1,9 +1,5 @@
-interface GetSkipsFilters {
-  studentId: number;
-}
-
 export class GetSkipsDTO {
-  filters?: Partial<GetSkipsFilters>;
+  studentId: number;
   limit?: number;
   page?: number;
 }

@@ -7,6 +7,7 @@ import {
   Post,
   Put,
   Query,
+  ValidationPipe,
 } from '@nestjs/common';
 
 import { Lesson } from './lesson.entity';
@@ -38,7 +39,9 @@ export class LessonsController {
   }
 
   @Get()
-  findAll(@Body() params: GetLessonsDTO): Promise<Lesson[]> {
+  findAll(
+    @Query(new ValidationPipe({ transform: true })) params: GetLessonsDTO,
+  ): Promise<Lesson[]> {
     return this.lessonsService.findAll(params);
   }
 }

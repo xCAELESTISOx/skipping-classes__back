@@ -1,11 +1,12 @@
 import {
-  Body,
   Controller,
   Get,
   HttpException,
   HttpStatus,
   Param,
   Put,
+  Query,
+  ValidationPipe,
 } from '@nestjs/common';
 
 import { GetUsersListDTO } from './dto/getUsersList.dto';
@@ -32,12 +33,14 @@ export class UsersController {
   }
 
   @Get()
-  findAll(@Body() params: GetUsersListDTO): Promise<User[]> {
+  findAll(
+    @Query(new ValidationPipe({ transform: true })) params: GetUsersListDTO,
+  ): Promise<User[]> {
     return this.usersService.findAll(params);
   }
 
   @Get(':id')
-  findOne(@Param('id') id?: number, @Body('email') email?: string) {
+  findOne(@Param('id') id?: number, @Query('email') email?: string) {
     const params = { id, email };
     return this.usersService.findOne(params);
   }
